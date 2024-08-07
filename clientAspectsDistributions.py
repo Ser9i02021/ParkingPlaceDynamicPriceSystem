@@ -22,4 +22,22 @@ plt.grid(True)
 plt.show()
 """
 
+class LogNormalStayingTimesDistribution():
+    def __init__(self, mu, sigma, sample_size) -> None:
+        # Parameters for the Log-Normal distribution
+        self.mu = mu if mu is not None else 1.5
+        self.sigma = sigma if sigma is not None else 0.5
+        self.sample_size =  sample_size if sample_size is not None else 1000
+
+        # Generate reservation prices
+        self.stayingTimes = np.random.lognormal(self.mu, self.sigma, self.sample_size)
+        
+        for i in range(len(self.stayingTimes)):
+            self.stayingTimes[i] = round(self.stayingTimes[i])
+        
+       #print(self.stayingTimes)
+        
+        
+
 LogNormalReservationPricesDistribution(mu=None, sigma=None, sample_size=10)
+LogNormalStayingTimesDistribution(mu=None, sigma=None, sample_size=10)
