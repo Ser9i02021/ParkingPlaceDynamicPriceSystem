@@ -11,6 +11,7 @@ class ParkingPlace():
         self.slotPrice = slotPrice
         self.full = full
         self.profit = profit
+        self.clientsInPP = []
 
     def reset(self):
         self.pSlots = np.zeros(10, bool)
@@ -56,12 +57,14 @@ class ParkingPlace():
 
 
 class Client:
-    def __init__(self, id, reservationPrice: int, pp: ParkingPlace):
+    def __init__(self, id, reservationPrice: int, timeStay: int, pp: ParkingPlace):
         self.id = id
         self.reservationPrice = reservationPrice
         self.valuePaid = 0
         self.pSlotOccupiedIndex = -1
+        self.timeStay = timeStay
         self.timeEntrance = 0
+        #self.timeExit = 0
         self.pp = pp
 
     def tryOccupyParkingSlot(self, slotPrice: int, presentTime: int):
@@ -79,11 +82,14 @@ class Client:
                         return True
         return False
 
-    def freeParkingSlot(self, timeExit: int):
+    def tryFreeParkingSlot(self, timePresent: int):
         if self.pSlotOccupiedIndex > -1:
-            timeInPP = timeExit - self.timeEntrance
-            self.valuePaid = self.valuePaid * timeInPP
-            self.pp.pSlots[self.pSlotOccupiedIndex] = False
-            self.pp.profit += self.valuePaid
-            self.pp.updateFullStatus()
+            if self.timeStay == timePresent - self.timeEntrance:
+                self.valuePaid = self.valuePaid * self.timeStay
+                self.pp.pSlots[self.pSlotOccupiedIndex] = False
+                #self.pSlotOccupiedIndex = -1
+                self.pp.profit += self.valuePaid
+                self.pp.updateFullStatus()
+                return True
+        return False
 
