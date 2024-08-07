@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from main import ParkingPlace, Client
-from fictionalData import LogNormalReservationPricesDistribution
+from clientAspectsDistributions import LogNormalReservationPricesDistribution, LogNormalStayingTimesDistribution
 
 class MallClientArrivalSimulator:
     def __init__(self, lambda_rates, periods, slots):
@@ -17,7 +17,7 @@ class MallClientArrivalSimulator:
         self.total_hours = sum(periods)
         self.slots = slots
         self.arrivals_per_time_slice = None
-        self.total_arrivals = None
+        self.total_arrivals = 0
         self.prices = None
         self.demandHistory = []
         self.simTime = 0
@@ -57,33 +57,69 @@ class MallClientArrivalSimulator:
         for lambda_rate, period in zip(self.lambda_rates, self.periods): 
             arrivalsFromPeriod = np.random.poisson(lambda_rate, period)
             #print(arrivals)
+
+            
+
             rpDistribution = LogNormalReservationPricesDistribution(mu=None, sigma=None, sample_size=sum(arrivalsFromPeriod))
+            stDistribution = LogNormalStayingTimesDistribution(mu=None, sigma=None, sample_size=sum(arrivalsFromPeriod))
 
             self.arrivals_per_time_slice.extend(arrivalsFromPeriod)
-
+            
+            # Iteration covering each slice of time for the current period
             for i in range(1, len(arrivalsFromPeriod) + 1):
+                print("instant %d" % self.simTime)
+                print()
+
+                # Verfiy if there are clients leaving their respective slots
+                ci = 0
+                while ci < len(pp.clientsInPP):
+                    if pp.clientsInPP[ci].tryFreeParkingSlot(self.simTime):
+                        print("client %d freed slot %d" % (pp.clientsInPP[ci].id, pp.clientsInPP[ci].pSlotOccupiedIndex))
+                        pp.clientsInPP.remove(pp.clientsInPP[ci])
+                        ci -= 1
+                    ci += 1
+
+
+
+                
+
                 # For each time slice, the parking place will measure the price for a slot based on the demand value in the same time slice on previous days,
                 # predicting the demand value for the present time slice
                 pp.setPrice(self.demandHistory, MorningAfternoonEvening * len(arrivalsFromPeriod) + (i - 1))                
                 
                 initial = 0 if i == 1 else arrivalsFromPeriod[i - 2]
                 end = arrivalsFromPeriod[i - 1] if i == 1 else arrivalsFromPeriod[i - 1] + arrivalsFromPeriod[i - 2]
-                # Each arrival represents a potential client, who has his/her own reservation price           
+                # Each arrival represents a potential client           
                 for clientNum in range(initial, end):
+                    # Generate the time that each client stays in his/her slot
+                    # ...
+                    clientTimeStay = stDistribution.stayingTimes[clientNum]
+                    
+                    # Generate the reservation price for each client
                     clientReservationPrice = rpDistribution.reservation_prices[clientNum]
-                    newPotentialClient = Client((len(self.arrivals_per_time_slice) + 1) * i, clientReservationPrice, pp)
-                    # If a slot is occupied, the slot price needs to be updated
+                    
+                    # Creates a new potential client
+                    newPotentialClient = Client(self.total_arrivals + clientNum, clientReservationPrice, clientTimeStay, pp)
+                    
+                    # If a slot is occupied by the new client, the slot price needs to be updated
                     if (newPotentialClient.tryOccupyParkingSlot(pp.getPrice(), self.simTime)):
                         pp.setPrice(self.demandHistory, MorningAfternoonEvening * len(arrivalsFromPeriod) + (i - 1))                
+                        
+                        # Also add the client to the vector of all active clients in the PP
+                        pp.clientsInPP.append(newPotentialClient)
 
-                    print("slots' state:")
-                    print(pp.pSlots)
+                        print("client %d occupied slot %d" % (newPotentialClient.id, newPotentialClient.pSlotOccupiedIndex))
+
+
+                    #print("slots' state:")
+                    #print(pp.pSlots)
                     print()
                 
                 # Update simTime every time slice
                 self.simTime += 1 
 
             MorningAfternoonEvening += 1
+            self.total_arrivals += sum(arrivalsFromPeriod)
         
         #self.total_arrivals = sum(self.arrivals_per_time_slice)
     
