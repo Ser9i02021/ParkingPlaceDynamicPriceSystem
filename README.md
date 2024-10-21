@@ -3,7 +3,7 @@
 Overview:
 This project aims to implement a dynamic pricing system for a mall parking place, simulating client arrivals, parking slot occupation, and dynamically adjusting parking prices based on real-time demand. The system leverages a combination of machine learning models, statistical distributions, and time-based simulations to optimize parking slot allocation and pricing.
 
-Key Components:
+#Key Components:
 
 Dynamic Pricing Model:
 The core of the system is a dynamic pricing mechanism that adjusts parking slot prices based on predicted demand. The pricing formula considers the number of free parking slots and predicted demand for each time slice (hourly). Prices increase with higher demand and fewer available slots, ensuring a balanced parking lot usage throughout the day.
