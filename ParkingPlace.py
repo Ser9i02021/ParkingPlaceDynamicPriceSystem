@@ -20,13 +20,17 @@ class ParkingPlace():
         self.full = False  # Marks the parking place as not full.
         self.profit = 0  # Resets the profit to 0.
 
+    # Time slice refers to 1 of the 24 hours of the day
     def setPrice(self, demandHistory: list, timeSliceToPredictDemand: int):
         # Dynamically set the slot price based on historical demand and the current number of free parking slots.
-
+        '''
         numFreePSlots = 0  # Counter for free parking slots.
         for ps in self.pSlots:
             if not ps:  # Check if the slot is free.
                 numFreePSlots += 1
+        '''
+        numFreePSlots = len(self.pSlots) - sum(self.pSlots) # Number of free slots
+        
 
         clientArrivalsOnThatHourOnPreviousDays = []  # List to collect arrivals for the specific hour across previous days.
         
