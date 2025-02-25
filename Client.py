@@ -41,7 +41,7 @@ class Client:
             if self.timeStay == timePresent - self.timeEntrance:
                 self.valuePaid = self.valuePaid * self.timeStay  # Calculate the total cost based on time stayed.
                 self.pp.pSlots[self.pSlotOccupiedIndex] = False  # Free the occupied slot (set to False).
-                # self.pSlotOccupiedIndex = -1  # (Optional) You could reset this value if needed after freeing the slot.
+                # self.pSlotOccupiedIndex = -1  # (Needs to be commented to print the correct index of the freed slot) You could reset this value if needed after freeing the slot.
                 self.pp.profit += self.valuePaid  # Add the client's payment to the parking lot's profit.
                 self.pp.updateFullStatus()  # Update the parking lot's full status (in case it's no longer full).
                 return True  # Freeing the slot was successful.
