@@ -18,8 +18,8 @@ class Client:
         # Attempt to occupy a parking slot if the price is within the client's reservation price.
 
         if not self.pp.full:  # Only attempt if the parking lot is not full.
-            print("slot price: %f" % slotPrice)  # Debug: Print the current slot price.
-            print("client reservation price: %f" % self.reservationPrice)  # Debug: Print the client's reservation price.
+            #print("slot price: %f" % slotPrice)  # Debug: Print the current slot price.
+            #print("client %d reservation price: %f" % (self.id, self.reservationPrice))  # Debug: Print the client's reservation price.
             
             if slotPrice <= self.reservationPrice:  # Check if the slot price is affordable for the client.
                 # Loop through the parking slots to find a free one.
